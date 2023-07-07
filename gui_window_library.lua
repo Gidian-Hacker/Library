@@ -215,7 +215,7 @@ local function load_config(Config)
 	table.foreach(Data, function(a,b)
 		if gui_window_library.flags[a] then
 			spawn(function() 
-				if gui_window_library.flags[a].Type == "Colorpicker" then
+				if gui_window_library.flags[a].Type == "colorpicker" then
 					gui_window_library.flags[a]:Set(unpack_color(b))
 				else
 					gui_window_library.flags[a]:Set(b)
@@ -231,7 +231,7 @@ local function save_config(Name)
 	local Data = {}
 	for i,v in pairs(gui_window_library.flags) do
 		if v.Save then
-			if v.Type == "Colorpicker" then
+			if v.Type == "colorpicker" then
 				Data[i] = pack_color(v.Value)
 			else
 				Data[i] = v.Value
@@ -1312,18 +1312,18 @@ function gui_window_library:make_window(window_config)
 				end
 				return bind
 			end  
-			function element_function:AddTextbox(TextboxConfig)
-				TextboxConfig = TextboxConfig or {}
-				TextboxConfig.Name = TextboxConfig.Name or "Textbox"
-				TextboxConfig.Default = TextboxConfig.Default or ""
-				TextboxConfig.TextDisappear = TextboxConfig.TextDisappear or false
-				TextboxConfig.Callback = TextboxConfig.Callback or function() end
+			function element_function:add_textbox(textbox_config)
+				textbox_config = textbox_config or {}
+				textbox_config.name = textbox_config.name or "Textbox"
+				textbox_config.default = textbox_config.default or ""
+				textbox_config.text_disappear = textbox_config.text_disappear or false
+				textbox_config.call_back = textbox_config.call_back or function() end
 
 				local Click = set_props(make_element("Button"), {
 					Size = UDim2.new(1, 0, 1, 0)
 				})
 
-				local TextboxActual = add_theme_object(Create("TextBox", {
+				local textbox_actual = add_theme_object(Create("TextBox", {
 					Size = UDim2.new(1, 0, 1, 0),
 					BackgroundTransparency = 1,
 					TextColor3 = Color3.fromRGB(255, 255, 255),
@@ -1335,84 +1335,84 @@ function gui_window_library:make_window(window_config)
 					ClearTextOnFocus = false
 				}), "text")
 
-				local Textcontainer = add_theme_object(set_children(set_props(make_element("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 4), {
+				local text_container = add_theme_object(set_children(set_props(make_element("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 4), {
 					Size = UDim2.new(0, 24, 0, 24),
 					Position = UDim2.new(1, -12, 0.5, 0),
 					AnchorPoint = Vector2.new(1, 0.5)
 				}), {
 					add_theme_object(make_element("Stroke"), "stroke"),
-					TextboxActual
+					textbox_actual
 				}), "main")
 
 
-				local TextboxFrame = add_theme_object(set_children(set_props(make_element("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
+				local textbox_frame = add_theme_object(set_children(set_props(make_element("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
 					Size = UDim2.new(1, 0, 0, 38),
 					Parent = item_parent
 				}), {
-					add_theme_object(set_props(make_element("Label", TextboxConfig.Name, 15), {
+					add_theme_object(set_props(make_element("Label", textbox_config.name, 15), {
 						Size = UDim2.new(1, -12, 1, 0),
 						Position = UDim2.new(0, 12, 0, 0),
 						Font = Enum.Font.GothamBold,
 						Name = "Content"
 					}), "text"),
 					add_theme_object(make_element("Stroke"), "stroke"),
-					Textcontainer,
+					text_container,
 					Click
 				}), "second")
 
-				add_connection(TextboxActual:GetPropertyChangedSignal("Text"), function()
-					tween_service:Create(Textcontainer, TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, TextboxActual.TextBounds.X + 16, 0, 24)}):Play()
+				add_connection(textbox_actual:GetPropertyChangedSignal("Text"), function()
+					tween_service:Create(text_container, TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, textbox_actual.TextBounds.X + 16, 0, 24)}):Play()
 				end)
 
-				add_connection(TextboxActual.FocusLost, function()
-					TextboxConfig.Callback(TextboxActual.Text)
-					if TextboxConfig.TextDisappear then
-						TextboxActual.Text = ""
+				add_connection(textbox_actual.FocusLost, function()
+					textbox_config.call_back(textbox_actual.Text)
+					if textbox_config.text_disappear then
+						textbox_actual.Text = ""
 					end	
 				end)
 
-				TextboxActual.Text = TextboxConfig.Default
+				textbox_actual.Text = textbox_config.default
 
 				add_connection(Click.MouseEnter, function()
-					tween_service:Create(TextboxFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(gui_window_library.themes[gui_window_library.selected_theme].second.R * 255 + 3, gui_window_library.themes[gui_window_library.selected_theme].second.G * 255 + 3, gui_window_library.themes[gui_window_library.selected_theme].second.B * 255 + 3)}):Play()
+					tween_service:Create(textbox_frame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(gui_window_library.themes[gui_window_library.selected_theme].second.R * 255 + 3, gui_window_library.themes[gui_window_library.selected_theme].second.G * 255 + 3, gui_window_library.themes[gui_window_library.selected_theme].second.B * 255 + 3)}):Play()
 				end)
 
 				add_connection(Click.MouseLeave, function()
-					tween_service:Create(TextboxFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = gui_window_library.themes[gui_window_library.selected_theme].second}):Play()
+					tween_service:Create(textbox_frame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = gui_window_library.themes[gui_window_library.selected_theme].second}):Play()
 				end)
 
 				add_connection(Click.MouseButton1Up, function()
-					tween_service:Create(TextboxFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(gui_window_library.themes[gui_window_library.selected_theme].second.R * 255 + 3, gui_window_library.themes[gui_window_library.selected_theme].second.G * 255 + 3, gui_window_library.themes[gui_window_library.selected_theme].second.B * 255 + 3)}):Play()
-					TextboxActual:CaptureFocus()
+					tween_service:Create(textbox_frame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(gui_window_library.themes[gui_window_library.selected_theme].second.R * 255 + 3, gui_window_library.themes[gui_window_library.selected_theme].second.G * 255 + 3, gui_window_library.themes[gui_window_library.selected_theme].second.B * 255 + 3)}):Play()
+					textbox_actual:CaptureFocus()
 				end)
 
 				add_connection(Click.MouseButton1Down, function()
-					tween_service:Create(TextboxFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(gui_window_library.themes[gui_window_library.selected_theme].second.R * 255 + 6, gui_window_library.themes[gui_window_library.selected_theme].second.G * 255 + 6, gui_window_library.themes[gui_window_library.selected_theme].second.B * 255 + 6)}):Play()
+					tween_service:Create(textbox_frame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(gui_window_library.themes[gui_window_library.selected_theme].second.R * 255 + 6, gui_window_library.themes[gui_window_library.selected_theme].second.G * 255 + 6, gui_window_library.themes[gui_window_library.selected_theme].second.B * 255 + 6)}):Play()
 				end)
 			end 
-			function element_function:AddColorpicker(ColorpickerConfig)
-				ColorpickerConfig = ColorpickerConfig or {}
-				ColorpickerConfig.Name = ColorpickerConfig.Name or "Colorpicker"
-				ColorpickerConfig.Default = ColorpickerConfig.Default or Color3.fromRGB(255,255,255)
-				ColorpickerConfig.Callback = ColorpickerConfig.Callback or function() end
-				ColorpickerConfig.Flag = ColorpickerConfig.Flag or nil
-				ColorpickerConfig.Save = ColorpickerConfig.Save or false
+			function element_function:add_colorpicker(colorpicker_config)
+				colorpicker_config = colorpicker_config or {}
+				colorpicker_config.name = colorpicker_config.name or "Colorpicker"
+				colorpicker_config.default = colorpicker_config.default or Color3.fromRGB(255,255,255)
+				colorpicker_config.call_back = colorpicker_config.call_back or function() end
+				colorpicker_config.flag = colorpicker_config.flag or nil
+				colorpicker_config.save = colorpicker_config.save or false
 
-				local ColorH, ColorS, ColorV = 1, 1, 1
-				local Colorpicker = {Value = ColorpickerConfig.Default, toggled = false, Type = "Colorpicker", Save = ColorpickerConfig.Save}
+				local color_h, color_s, color_v = 1, 1, 1
+				local colorpicker = {Value = colorpicker_config.default, toggled = false, Type = "colorpicker", Save = colorpicker_config.save}
 
-				local ColorSelection = Create("ImageLabel", {
+				local color_selection = Create("ImageLabel", {
 					Size = UDim2.new(0, 18, 0, 18),
-					Position = UDim2.new(select(3, Color3.toHSV(Colorpicker.Value))),
+					Position = UDim2.new(select(3, Color3.toHSV(colorpicker.Value))),
 					ScaleType = Enum.ScaleType.Fit,
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					BackgroundTransparency = 1,
 					Image = "http://www.roblox.com/asset/?id=4805639000"
 				})
 
-				local HueSelection = Create("ImageLabel", {
+				local hue_selection = Create("ImageLabel", {
 					Size = UDim2.new(0, 18, 0, 18),
-					Position = UDim2.new(0.5, 0, 1 - select(1, Color3.toHSV(Colorpicker.Value))),
+					Position = UDim2.new(0.5, 0, 1 - select(1, Color3.toHSV(colorpicker.Value))),
 					ScaleType = Enum.ScaleType.Fit,
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					BackgroundTransparency = 1,
@@ -1425,26 +1425,26 @@ function gui_window_library:make_window(window_config)
 					Image = "rbxassetid://4155801252"
 				}, {
 					Create("UICorner", {CornerRadius = UDim.new(0, 5)}),
-					ColorSelection
+					color_selection
 				})
 
-				local Hue = Create("Frame", {
+				local hue = Create("Frame", {
 					Size = UDim2.new(0, 20, 1, 0),
 					Position = UDim2.new(1, -20, 0, 0),
 					Visible = false
 				}, {
-					Create("UIGradient", {Rotation = 270, Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 4)), ColorSequenceKeypoint.new(0.20, Color3.fromRGB(234, 255, 0)), ColorSequenceKeypoint.new(0.40, Color3.fromRGB(21, 255, 0)), ColorSequenceKeypoint.new(0.60, Color3.fromRGB(0, 255, 255)), ColorSequenceKeypoint.new(0.80, Color3.fromRGB(0, 17, 255)), ColorSequenceKeypoint.new(0.90, Color3.fromRGB(255, 0, 251)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 4))},}),
+					Create("UIGradient", {Rotation = 270, Color = color_sequence.new{color_sequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 4)), color_sequenceKeypoint.new(0.20, Color3.fromRGB(234, 255, 0)), color_sequenceKeypoint.new(0.40, Color3.fromRGB(21, 255, 0)), color_sequenceKeypoint.new(0.60, Color3.fromRGB(0, 255, 255)), color_sequenceKeypoint.new(0.80, Color3.fromRGB(0, 17, 255)), color_sequenceKeypoint.new(0.90, Color3.fromRGB(255, 0, 251)), color_sequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 4))},}),
 					Create("UICorner", {CornerRadius = UDim.new(0, 5)}),
-					HueSelection
+					hue_selection
 				})
 
-				local Colorpickercontainer = Create("Frame", {
+				local colorpicker_container = Create("Frame", {
 					Position = UDim2.new(0, 0, 0, 32),
 					Size = UDim2.new(1, 0, 1, -32),
 					BackgroundTransparency = 1,
 					ClipsDescendants = true
 				}, {
-					Hue,
+					hue,
 					Color,
 					Create("UIPadding", {
 						PaddingLeft = UDim.new(0, 35),
@@ -1458,7 +1458,7 @@ function gui_window_library:make_window(window_config)
 					Size = UDim2.new(1, 0, 1, 0)
 				})
 
-				local ColorpickerBox = add_theme_object(set_children(set_props(make_element("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 4), {
+				local colorpicker_box = add_theme_object(set_children(set_props(make_element("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 4), {
 					Size = UDim2.new(0, 24, 0, 24),
 					Position = UDim2.new(1, -12, 0.5, 0),
 					AnchorPoint = Vector2.new(1, 0.5)
@@ -1466,18 +1466,18 @@ function gui_window_library:make_window(window_config)
 					add_theme_object(make_element("Stroke"), "stroke")
 				}), "main")
 
-				local ColorpickerFrame = add_theme_object(set_children(set_props(make_element("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
+				local colorpicker_frame = add_theme_object(set_children(set_props(make_element("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
 					Size = UDim2.new(1, 0, 0, 38),
 					Parent = item_parent
 				}), {
 					set_props(set_children(make_element("TFrame"), {
-						add_theme_object(set_props(make_element("Label", ColorpickerConfig.Name, 15), {
+						add_theme_object(set_props(make_element("Label", colorpicker_config.name, 15), {
 							Size = UDim2.new(1, -12, 1, 0),
 							Position = UDim2.new(0, 12, 0, 0),
 							Font = Enum.Font.GothamBold,
 							Name = "Content"
 						}), "text"),
-						ColorpickerBox,
+						colorpicker_box,
 						Click,
 						add_theme_object(set_props(make_element("Frame"), {
 							Size = UDim2.new(1, 0, 0, 1),
@@ -1490,104 +1490,104 @@ function gui_window_library:make_window(window_config)
 						ClipsDescendants = true,
 						Name = "F"
 					}),
-					Colorpickercontainer,
+					colorpicker_container,
 					add_theme_object(make_element("Stroke"), "stroke"),
 				}), "second")
 
 				add_connection(Click.MouseButton1Click, function()
-					Colorpicker.toggled = not Colorpicker.toggled
-					tween_service:Create(ColorpickerFrame,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = Colorpicker.toggled and UDim2.new(1, 0, 0, 148) or UDim2.new(1, 0, 0, 38)}):Play()
-					Color.Visible = Colorpicker.toggled
-					Hue.Visible = Colorpicker.toggled
-					ColorpickerFrame.F.Line.Visible = Colorpicker.toggled
+					colorpicker.toggled = not colorpicker.toggled
+					tween_service:Create(colorpicker_frame,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = colorpicker.toggled and UDim2.new(1, 0, 0, 148) or UDim2.new(1, 0, 0, 38)}):Play()
+					Color.Visible = colorpicker.toggled
+					hue.Visible = colorpicker.toggled
+					colorpicker_frame.F.Line.Visible = colorpicker.toggled
 				end)
 
-				local function UpdateColorPicker()
-					ColorpickerBox.BackgroundColor3 = Color3.fromHSV(ColorH, ColorS, ColorV)
-					Color.BackgroundColor3 = Color3.fromHSV(ColorH, 1, 1)
-					Colorpicker:Set(ColorpickerBox.BackgroundColor3)
-					ColorpickerConfig.Callback(ColorpickerBox.BackgroundColor3)
+				local function update_colorpicker()
+					colorpicker_box.BackgroundColor3 = Color3.fromHSV(color_h, color_s, color_v)
+					Color.BackgroundColor3 = Color3.fromHSV(color_h, 1, 1)
+					colorpicker:set(colorpicker_box.BackgroundColor3)
+					colorpicker_config.call_back(colorpicker_box.BackgroundColor3)
 					save_config(game.GameId)
 				end
 
-				ColorH = 1 - (math.clamp(HueSelection.AbsolutePosition.Y - Hue.AbsolutePosition.Y, 0, Hue.AbsoluteSize.Y) / Hue.AbsoluteSize.Y)
-				ColorS = (math.clamp(ColorSelection.AbsolutePosition.X - Color.AbsolutePosition.X, 0, Color.AbsoluteSize.X) / Color.AbsoluteSize.X)
-				ColorV = 1 - (math.clamp(ColorSelection.AbsolutePosition.Y - Color.AbsolutePosition.Y, 0, Color.AbsoluteSize.Y) / Color.AbsoluteSize.Y)
+				color_h = 1 - (math.clamp(hue_selection.AbsolutePosition.Y - hue.AbsolutePosition.Y, 0, hue.AbsoluteSize.Y) / hue.AbsoluteSize.Y)
+				color_s = (math.clamp(color_selection.AbsolutePosition.X - Color.AbsolutePosition.X, 0, Color.AbsoluteSize.X) / Color.AbsoluteSize.X)
+				color_v = 1 - (math.clamp(color_selection.AbsolutePosition.Y - Color.AbsolutePosition.Y, 0, Color.AbsoluteSize.Y) / Color.AbsoluteSize.Y)
 
 				add_connection(Color.InputBegan, function(input)
 					if input.UserInputType == Enum.UserInputType.MouseButton1 then
-						if ColorInput then
-							ColorInput:Disconnect()
+						if color_input then
+							color_input:Disconnect()
 						end
-						ColorInput = add_connection(run_service.RenderStepped, function()
+						color_input = add_connection(run_service.RenderStepped, function()
 							local ColorX = (math.clamp(Mouse.X - Color.AbsolutePosition.X, 0, Color.AbsoluteSize.X) / Color.AbsoluteSize.X)
 							local ColorY = (math.clamp(Mouse.Y - Color.AbsolutePosition.Y, 0, Color.AbsoluteSize.Y) / Color.AbsoluteSize.Y)
-							ColorSelection.Position = UDim2.new(ColorX, 0, ColorY, 0)
-							ColorS = ColorX
-							ColorV = 1 - ColorY
-							UpdateColorPicker()
+							color_selection.Position = UDim2.new(ColorX, 0, ColorY, 0)
+							color_s = ColorX
+							color_v = 1 - ColorY
+							update_colorpicker()
 						end)
 					end
 				end)
 
 				add_connection(Color.InputEnded, function(input)
 					if input.UserInputType == Enum.UserInputType.MouseButton1 then
-						if ColorInput then
-							ColorInput:Disconnect()
+						if color_input then
+							color_input:Disconnect()
 						end
 					end
 				end)
 
-				add_connection(Hue.InputBegan, function(input)
+				add_connection(hue.InputBegan, function(input)
 					if input.UserInputType == Enum.UserInputType.MouseButton1 then
-						if HueInput then
-							HueInput:Disconnect()
+						if hue_input then
+							hue_input:Disconnect()
 						end;
 
-						HueInput = add_connection(run_service.RenderStepped, function()
-							local HueY = (math.clamp(Mouse.Y - Hue.AbsolutePosition.Y, 0, Hue.AbsoluteSize.Y) / Hue.AbsoluteSize.Y)
+						hue_input = add_connection(run_service.RenderStepped, function()
+							local hueY = (math.clamp(Mouse.Y - hue.AbsolutePosition.Y, 0, hue.AbsoluteSize.Y) / hue.AbsoluteSize.Y)
 
-							HueSelection.Position = UDim2.new(0.5, 0, HueY, 0)
-							ColorH = 1 - HueY
+							hue_selection.Position = UDim2.new(0.5, 0, hueY, 0)
+							color_h = 1 - hueY
 
-							UpdateColorPicker()
+							update_colorpicker()
 						end)
 					end
 				end)
 
-				add_connection(Hue.InputEnded, function(input)
+				add_connection(hue.InputEnded, function(input)
 					if input.UserInputType == Enum.UserInputType.MouseButton1 then
-						if HueInput then
-							HueInput:Disconnect()
+						if hue_input then
+							hue_input:Disconnect()
 						end
 					end
 				end)
 
-				function Colorpicker:Set(Value)
-					Colorpicker.Value = Value
-					ColorpickerBox.BackgroundColor3 = Colorpicker.Value
-					ColorpickerConfig.Callback(Colorpicker.Value)
+				function colorpicker:set(Value)
+					colorpicker.Value = Value
+					colorpicker_box.BackgroundColor3 = colorpicker.Value
+					colorpicker_config.call_back(colorpicker.Value)
 				end
 
-				Colorpicker:Set(Colorpicker.Value)
-				if ColorpickerConfig.Flag then				
-					gui_window_library.flags[ColorpickerConfig.Flag] = Colorpicker
+				colorpicker:set(colorpicker.Value)
+				if colorpicker_config.flag then				
+					gui_window_library.flags[colorpicker_config.flag] = colorpicker
 				end
-				return Colorpicker
+				return colorpicker
 			end  
 			return element_function   
 		end	
 
 		local element_function = {}
 
-		function element_function:AddSection(SectionConfig)
-			SectionConfig.Name = SectionConfig.Name or "Section"
+		function element_function:add_section(section_config)
+			section_config.name = section_config.name or "Section"
 
-			local SectionFrame = set_children(set_props(make_element("TFrame"), {
+			local section_frame = set_children(set_props(make_element("TFrame"), {
 				Size = UDim2.new(1, 0, 0, 26),
 				Parent = container
 			}), {
-				add_theme_object(set_props(make_element("Label", SectionConfig.Name, 14), {
+				add_theme_object(set_props(make_element("Label", section_config.name, 14), {
 					Size = UDim2.new(1, -12, 0, 16),
 					Position = UDim2.new(0, 0, 0, 3),
 					Font = Enum.Font.GothamSemibold
@@ -1602,16 +1602,16 @@ function gui_window_library:make_window(window_config)
 				}),
 			})
 
-			add_connection(SectionFrame.Holder.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
-				SectionFrame.Size = UDim2.new(1, 0, 0, SectionFrame.Holder.UIListLayout.AbsoluteContentSize.Y + 31)
-				SectionFrame.Holder.Size = UDim2.new(1, 0, 0, SectionFrame.Holder.UIListLayout.AbsoluteContentSize.Y)
+			add_connection(section_frame.Holder.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
+				section_frame.Size = UDim2.new(1, 0, 0, section_frame.Holder.UIListLayout.AbsoluteContentSize.Y + 31)
+				section_frame.Holder.Size = UDim2.new(1, 0, 0, section_frame.Holder.UIListLayout.AbsoluteContentSize.Y)
 			end)
 
-			local SectionFunction = {}
-			for i, v in next, get_elements(SectionFrame.Holder) do
-				SectionFunction[i] = v 
+			local section_function = {}
+			for i, v in next, get_elements(section_frame.Holder) do
+				section_function[i] = v 
 			end
-			return SectionFunction
+			return section_function
 		end	
 
 		for i, v in next, get_elements(container) do
